@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homeostasis revision resource</title>
+<style>
+  :root {
+    --bg:#f7f6f2; --card:#ffffff; --text:#1f1f1d; --muted:#5f5e5a; --border:#d9d7cf;
+    --accent:#0F6E56; --accent-bg:#E1F5EE; --accent-text:#085041;
+    --purple:#534AB7; --purple-bg:#EEEDFE; --purple-text:#3C3489;
+    --good:#3B6D11; --good-bg:#EAF3DE; --bad:#A32D2D; --bad-bg:#FCEBEB; --amber-bg:#FAEEDA; --amber-text:#633806;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#1c1c1a; --card:#262624; --text:#ecebe4; --muted:#b4b2a9; --border:#444441;
+      --accent:#5DCAA5; --accent-bg:#04342C; --accent-text:#9FE1CB;
+      --purple:#AFA9EC; --purple-bg:#26215C; --purple-text:#CECBF6;
+      --good:#97C459; --good-bg:#173404; --bad:#F09595; --bad-bg:#501313; --amber-bg:#412402; --amber-text:#FAC775;
+    }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.6; font-size:16px; }
+  header { padding:28px 16px 8px; max-width:900px; margin:0 auto; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+  h1 { font-size:26px; font-weight:500; margin:0 0 4px; }
+  header p { margin:0; color:var(--muted); }
+  nav { position:sticky; top:0; z-index:5; background:var(--bg); border-bottom:1px solid var(--border); padding:10px 16px; }
+  .tabs { max-width:900px; margin:0 auto; display:flex; gap:8px; flex-wrap:wrap; }
+  .tab { font:inherit; padding:8px 16px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; }
+  .tab[aria-selected="true"] { background:var(--accent); border-color:var(--accent); color:#fff; }
+  @media (prefers-color-scheme: dark) { .tab[aria-selected="true"] { color:#04342C; } }
+  main { max-width:900px; margin:0 auto; padding:20px 16px 56px; }
+  section[hidden] { display:none; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 20px; }
+  .chip { font:inherit; font-size:14px; padding:4px 12px; border-radius:999px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; text-decoration:none; }
+  .chip:hover { border-color:var(--accent); }
+  .chip.on { background:var(--accent-bg); border-color:var(--accent); color:var(--accent-text); }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin:0 0 20px; }
+  .card h2 { font-size:20px; font-weight:500; margin:0 0 10px; color:var(--accent-text); }
+  .card ul { margin:0; padding-left:20px; }
+  .card li { margin:0 0 8px; }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:14px 0 4px; }
+  .flow .step { background:var(--purple-bg); color:var(--purple-text); padding:4px 10px; border-radius:6px; font-size:14px; }
+  .flow .arr { color:var(--muted); }
+  .flowlabel { font-size:13px; color:var(--muted); margin:14px 0 0; }
+  table { width:100%; border-collapse:collapse; margin:14px 0 0; font-size:15px; }
+  th, td { text-align:left; padding:8px 10px; border:1px solid var(--border); vertical-align:top; }
+  th { background:var(--accent-bg); color:var(--accent-text); font-weight:500; }
+  .fc-wrap { max-width:560px; margin:0 auto; }
+  .fc { width:100%; min-height:240px; font:inherit; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; cursor:pointer; color:var(--text); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; text-align:center; }
+  .fc.back { background:var(--purple-bg); border-color:var(--purple); color:var(--purple-text); }
+  .fc .side { font-size:13px; color:var(--muted); }
+  .fc.back .side { color:var(--purple-text); }
+  .fc .txt { font-size:22px; font-weight:500; }
+  .fc.back .txt { font-size:18px; font-weight:400; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; margin:14px 0; }
+  .btn { font:inherit; padding:8px 16px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; }
+  .btn:hover { border-color:var(--accent); }
+  .btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+  @media (prefers-color-scheme: dark) { .btn.primary { color:#04342C; } }
+  .muted { color:var(--muted); font-size:14px; }
+  .opt { display:block; width:100%; text-align:left; font:inherit; padding:12px 14px; margin:0 0 10px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; }
+  .opt:hover:enabled { border-color:var(--accent); }
+  .opt.ok { background:var(--good-bg); border-color:var(--good); }
+  .opt.no { background:var(--bad-bg); border-color:var(--bad); }
+  .opt:disabled { cursor:default; color:var(--text); opacity:1; }
+  .fb { padding:12px 14px; border-radius:8px; background:var(--amber-bg); color:var(--amber-text); margin:4px 0 14px; font-size:15px; }
+  .bar { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin:0 0 16px; }
+  .bar span { display:block; height:100%; background:var(--accent); }
+  .tag { display:inline-block; font-size:12px; padding:2px 10px; border-radius:999px; background:var(--accent-bg); color:var(--accent-text); margin-right:8px; vertical-align:top; }
+  .marks { display:inline-block; font-size:12px; padding:2px 10px; border-radius:999px; background:var(--purple-bg); color:var(--purple-text); vertical-align:top; }
+  textarea { width:100%; min-height:90px; font:inherit; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin:10px 0; resize:vertical; }
+  .ms { background:var(--good-bg); border-radius:8px; padding:12px 14px; margin-top:10px; }
+  .ms ul { margin:0; padding-left:20px; }
+  .ms li { margin:0 0 6px; }
+  .ms p { margin:8px 0 0; font-size:14px; color:var(--muted); }
+  .score { font-size:40px; font-weight:500; margin:0; color:var(--accent-text); }
+
+  /* Spanish translation: hidden by default, shown under the English when switched on */
+  .es { display:none; }
+  body.es-on .es { display:block; margin-top:2px; font-style:italic; font-size:.93em; opacity:.82; }
+  .lang-btn[aria-pressed="true"] { background:var(--purple-bg); border-color:var(--purple); color:var(--purple-text); }
+  .lang-btn[aria-pressed="true"]::before { content:"\2713  "; }
+
+  @media print { nav, .no-print { display:none !important; } body { background:#fff; } .card { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Homeostasis revision resource<span class="es" lang="es">Recurso de repaso de homeostasis</span></h1>
+    <p>Year 11 AQA GCSE Biology: Homeostasis and Response<span class="es" lang="es">Biología GCSE (AQA), 11.º curso: homeostasis y respuesta</span></p>
+  </div>
+  <button class="btn lang-btn no-print" id="esToggle" type="button" aria-pressed="false">Español · Spanish translation</button>
+</header>
+
+<nav class="no-print">
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="notes" aria-selected="true">Notes<span class="es" lang="es">Apuntes</span></button>
+    <button class="tab" role="tab" data-tab="cards" aria-selected="false">Flashcards<span class="es" lang="es">Tarjetas</span></button>
+    <button class="tab" role="tab" data-tab="quiz" aria-selected="false">Quiz<span class="es" lang="es">Cuestionario</span></button>
+    <button class="tab" role="tab" data-tab="exam" aria-selected="false">Exam questions<span class="es" lang="es">Preguntas de examen</span></button>
+  </div>
+</nav>
+
+<main>
+  <section id="notes"></section>
+
+  <section id="cards" hidden>
+    <div class="chips" id="cardFilter"></div>
+    <div class="fc-wrap">
+      <button class="fc" id="fc" aria-live="polite"></button>
+      <div class="row">
+        <button class="btn" id="fcPrev">Previous<span class="es" lang="es">Anterior</span></button>
+        <span class="muted" id="fcCount"></span>
+        <button class="btn" id="fcNext">Next<span class="es" lang="es">Siguiente</span></button>
+      </div>
+      <div class="row"><button class="btn" id="fcShuffle">Shuffle<span class="es" lang="es">Mezclar</span></button></div>
+      <p class="muted" style="text-align:center">Click the card to flip it. Try to answer out loud before you flip.<span class="es" lang="es">Haz clic en la tarjeta para darle la vuelta. Intenta responder en voz alta antes de girarla.</span></p>
+    </div>
+  </section>
+
+  <section id="quiz" hidden>
+    <div class="chips" id="quizFilter"></div>
+    <div id="quizBody"></div>
+  </section>
+
+  <section id="exam" hidden>
+    <p class="muted">Write your answer first, then reveal the mark scheme and mark yourself honestly.<span class="es" lang="es">Escribe primero tu respuesta; después muestra los criterios de calificación y corrígete con honestidad.</span></p>
+    <div id="examBody"></div>
+  </section>
+</main>
+
+<script>
+/* b(english, spanish) returns the English text with the Spanish underneath (shown only when the toggle is on). */
+const b = (en,es)=> (!es || es===en) ? en : en+'<span class="es" lang="es">'+es+'</span>';
+
+const T = {
+  principles:["Principles of homeostasis","Principios de la homeostasis"],
+  nervous:["Nervous system","Sistema nervioso"],
+  endocrine:["Endocrine system","Sistema endocrino"],
+  glucose:["Blood glucose","Glucosa en sangre"],
+  repro:["Reproduction","Reproducción"],
+  plants:["Plant hormones","Hormonas vegetales"]
+};
+const TT = k => b(T[k][0],T[k][1]);
+
+const notes = [
+ { id:"principles", points:[
+   b("<strong>Homeostasis</strong> is the regulation of the internal conditions of a cell or organism to maintain optimum conditions for function, in response to internal and external changes.",
+     "La <strong>homeostasis</strong> es la regulación de las condiciones internas de una célula o un organismo para mantener las condiciones óptimas de funcionamiento, en respuesta a cambios internos y externos."),
+   b("Cells need stable conditions so that enzymes and other cell processes can work properly.",
+     "Las células necesitan condiciones estables para que las enzimas y otros procesos celulares funcionen correctamente."),
+   b("Automatic control systems have three parts: <strong>receptors</strong> (detect stimuli), <strong>coordination centres</strong> (receive and process information, then send instructions, e.g. brain, spinal cord, pancreas) and <strong>effectors</strong> (muscles or glands that bring about the response).",
+     "Los sistemas de control automáticos tienen tres partes: <strong>receptores</strong> (detectan estímulos), <strong>centros de coordinación</strong> (reciben y procesan la información y luego envían instrucciones, p. ej. el cerebro, la médula espinal, el páncreas) y <strong>efectores</strong> (músculos o glándulas que producen la respuesta)."),
+   b("<strong>Negative feedback</strong>: a change is detected and the response reverses it, so the condition returns to normal.",
+     "<strong>Retroalimentación negativa</strong>: se detecta un cambio y la respuesta lo revierte, de modo que la condición vuelve a la normalidad.")
+  ], flowLabel:["Control system","Sistema de control"],
+  flow:[["Stimulus","Estímulo"],["Receptor","Receptor"],["Coordination centre","Centro de coordinación"],["Effector","Efector"],["Response","Respuesta"]] },
+
+ { id:"nervous", points:[
+   b("The nervous system lets us react to our surroundings and coordinate our behaviour.",
+     "El sistema nervioso nos permite reaccionar a nuestro entorno y coordinar nuestro comportamiento."),
+   b("The <strong>central nervous system (CNS)</strong> is the brain and spinal cord.",
+     "El <strong>sistema nervioso central (SNC)</strong> está formado por el cerebro y la médula espinal."),
+   b("<strong>Sensory neurones</strong> carry impulses from receptors to the CNS. <strong>Relay neurones</strong> connect neurones inside the CNS. <strong>Motor neurones</strong> carry impulses from the CNS to effectors.",
+     "Las <strong>neuronas sensoriales</strong> llevan los impulsos desde los receptores hasta el SNC. Las <strong>neuronas de relevo</strong> conectan neuronas dentro del SNC. Las <strong>neuronas motoras</strong> llevan los impulsos desde el SNC hasta los efectores."),
+   b("Effectors are muscles (contract) or glands (secrete chemicals such as hormones).",
+     "Los efectores son músculos (se contraen) o glándulas (secretan sustancias químicas como las hormonas)."),
+   b("<strong>Reflex actions</strong> are automatic and rapid and do not involve the conscious part of the brain. They protect the body from harm.",
+     "Los <strong>actos reflejos</strong> son automáticos y rápidos y no involucran la parte consciente del cerebro. Protegen al cuerpo del daño."),
+   b("A <strong>synapse</strong> is the gap between two neurones. The impulse triggers the release of <strong>neurotransmitter</strong> chemicals, which diffuse across the gap and bind to receptor molecules on the next neurone, starting a new electrical impulse.",
+     "Una <strong>sinapsis</strong> es el espacio entre dos neuronas. El impulso desencadena la liberación de sustancias químicas llamadas <strong>neurotransmisores</strong>, que se difunden a través del espacio y se unen a moléculas receptoras de la siguiente neurona, iniciando un nuevo impulso eléctrico."),
+   b("<strong>Required practical: reaction time.</strong> A partner drops a ruler and you catch it. A shorter distance caught means a faster reaction time. Control variables (same hand, same ruler, same drop height), repeat and calculate a mean. Change only one independent variable, e.g. caffeine, practice or distraction.",
+     "<strong>Práctica requerida: tiempo de reacción.</strong> Un compañero deja caer una regla y tú la atrapas. Una distancia menor significa un tiempo de reacción más rápido. Controla las variables (misma mano, misma regla, misma altura de caída), repite y calcula la media. Cambia solo una variable independiente, p. ej. cafeína, práctica o distracción.")
+  ], flowLabel:["Reflex arc","Arco reflejo"],
+  flow:[["Stimulus","Estímulo"],["Receptor","Receptor"],["Sensory neurone","Neurona sensorial"],["Relay neurone","Neurona de relevo"],["Motor neurone","Neurona motora"],["Effector","Efector"],["Response","Respuesta"]] },
+
+ { id:"endocrine", points:[
+   b("The <strong>endocrine system</strong> is made up of glands that secrete <strong>hormones</strong> directly into the bloodstream.",
+     "El <strong>sistema endocrino</strong> está formado por glándulas que secretan <strong>hormonas</strong> directamente en el torrente sanguíneo."),
+   b("Hormones are chemical messengers. The blood carries them to <strong>target organs</strong>, where they produce an effect.",
+     "Las hormonas son mensajeros químicos. La sangre las transporta hasta los <strong>órganos diana</strong>, donde producen un efecto."),
+   b("The <strong>pituitary gland</strong> in the brain is the 'master gland'. It secretes hormones (e.g. FSH and LH) that act on other glands.",
+     "La <strong>glándula pituitaria (hipófisis)</strong>, situada en el cerebro, es la «glándula maestra». Secreta hormonas (p. ej. FSH y LH) que actúan sobre otras glándulas."),
+   b("Other glands include the <strong>pancreas</strong> (insulin, glucagon), <strong>ovaries</strong> (oestrogen, progesterone) and <strong>testes</strong> (testosterone).",
+     "Otras glándulas son el <strong>páncreas</strong> (insulina, glucagón), los <strong>ovarios</strong> (estrógeno, progesterona) y los <strong>testículos</strong> (testosterona).")
+  ], table:{ head:[["",""],["Nervous system","Sistema nervioso"],["Hormonal system","Sistema hormonal"]], rows:[
+   [["Message","Mensaje"],["Electrical impulses","Impulsos eléctricos"],["Chemical hormones","Hormonas químicas"]],
+   [["Pathway","Vía"],["Neurones","Neuronas"],["Blood","Sangre"]],
+   [["Speed","Velocidad"],["Very fast","Muy rápida"],["Slower","Más lenta"]],
+   [["Duration of effect","Duración del efecto"],["Short","Corta"],["Longer-lasting","Más duradera"]],
+   [["Area affected","Zona afectada"],["Precise, specific area","Zona precisa y específica"],["Target organs, often wider","Órganos diana, a menudo más amplia"]]
+  ]} },
+
+ { id:"glucose", points:[
+   b("Blood glucose concentration is monitored and controlled by the <strong>pancreas</strong>.",
+     "La concentración de glucosa en sangre es controlada por el <strong>páncreas</strong>."),
+   b("<strong>Too high</strong> (e.g. after a meal): the pancreas releases <strong>insulin</strong>. Glucose moves from the blood into cells. In the liver and muscles, excess glucose is converted to <strong>glycogen</strong> for storage. Blood glucose falls.",
+     "<strong>Demasiado alta</strong> (p. ej. después de comer): el páncreas libera <strong>insulina</strong>. La glucosa pasa de la sangre a las células. En el hígado y los músculos, el exceso de glucosa se convierte en <strong>glucógeno</strong> para almacenarse. La glucosa en sangre disminuye."),
+   b("<strong>Too low</strong>: the pancreas releases <strong>glucagon</strong>. The liver converts glycogen back to glucose and releases it into the blood. Blood glucose rises.",
+     "<strong>Demasiado baja</strong>: el páncreas libera <strong>glucagón</strong>. El hígado convierte el glucógeno de nuevo en glucosa y la libera a la sangre. La glucosa en sangre aumenta."),
+   b("Insulin and glucagon work in opposite directions, which is negative feedback.",
+     "La insulina y el glucagón actúan en sentidos opuestos, lo que es retroalimentación negativa.")
+  ], flowLabel:["After a meal","Después de una comida"],
+  flow:[["Blood glucose rises","La glucosa en sangre sube"],["Pancreas releases insulin","El páncreas libera insulina"],["Cells take up glucose; liver stores glycogen","Las células absorben glucosa; el hígado almacena glucógeno"],["Blood glucose falls","La glucosa en sangre baja"]],
+  table:{ head:[["",""],["Type 1 diabetes","Diabetes tipo 1"],["Type 2 diabetes","Diabetes tipo 2"]], rows:[
+   [["Cause","Causa"],["Pancreas produces little or no insulin","El páncreas produce poca o ninguna insulina"],["Body cells no longer respond properly to insulin","Las células del cuerpo ya no responden bien a la insulina"]],
+   [["Treatment","Tratamiento"],["Insulin injections (and careful diet)","Inyecciones de insulina (y dieta cuidadosa)"],["Carbohydrate-controlled diet and exercise","Dieta con control de carbohidratos y ejercicio"]],
+   [["Risk factor","Factor de riesgo"],["Not linked to lifestyle","No está relacionada con el estilo de vida"],["Obesity","Obesidad"]]
+  ]} },
+
+ { id:"repro", points:[
+   b("At puberty, reproductive hormones trigger the secondary sexual characteristics.",
+     "En la pubertad, las hormonas reproductivas desencadenan los caracteres sexuales secundarios."),
+   b("<strong>Testosterone</strong> is the main male reproductive hormone. It is produced by the testes and stimulates sperm production.",
+     "La <strong>testosterona</strong> es la principal hormona reproductiva masculina. La producen los testículos y estimula la producción de espermatozoides."),
+   b("<strong>Oestrogen</strong> is the main female reproductive hormone. It is produced by the ovaries. Once a month an egg matures and is released from an ovary (<strong>ovulation</strong>).",
+     "El <strong>estrógeno</strong> es la principal hormona reproductiva femenina. Lo producen los ovarios. Una vez al mes madura un óvulo y se libera de un ovario (<strong>ovulación</strong>)."),
+   b("The <strong>menstrual cycle</strong> lasts about 28 days. The uterus lining builds up, an egg is released around day 14, the lining is maintained, and it is shed if the egg is not fertilised.",
+     "El <strong>ciclo menstrual</strong> dura unos 28 días. El revestimiento del útero se engrosa, alrededor del día 14 se libera un óvulo, el revestimiento se mantiene y se desprende si el óvulo no es fecundado."),
+   b("<strong>Contraception.</strong> Hormonal methods: the oral contraceptive (the pill) contains oestrogen and progesterone and stops FSH being produced, so eggs do not mature. Implants, injections and patches release progesterone slowly. Non-hormonal methods: condoms and diaphragms (barrier), IUDs, spermicides, abstaining, surgical sterilisation.",
+     "<strong>Anticoncepción.</strong> Métodos hormonales: el anticonceptivo oral (la píldora) contiene estrógeno y progesterona e impide que se produzca FSH, por lo que los óvulos no maduran. Los implantes, las inyecciones y los parches liberan progesterona lentamente. Métodos no hormonales: preservativos y diafragmas (de barrera), DIU, espermicidas, abstinencia, esterilización quirúrgica."),
+   b("<strong>Treating infertility.</strong> FSH and LH can be given as a fertility drug to stimulate ovulation. In <strong>IVF</strong>, FSH and LH stimulate several eggs to mature. The eggs are collected, fertilised with sperm in a lab and grow into embryos. One or two embryos are then placed in the uterus.",
+     "<strong>Tratamiento de la infertilidad.</strong> Se pueden administrar FSH y LH como medicamento de fertilidad para estimular la ovulación. En la <strong>FIV</strong>, la FSH y la LH estimulan la maduración de varios óvulos. Los óvulos se extraen, se fecundan con espermatozoides en el laboratorio y se desarrollan como embriones. Después se colocan uno o dos embriones en el útero."),
+   b("<strong>Evaluating IVF:</strong> it helps infertile couples have children, but it is physically and emotionally stressful, has a low success rate and can lead to multiple births, which carry health risks.",
+     "<strong>Evaluación de la FIV:</strong> ayuda a las parejas infértiles a tener hijos, pero es física y emocionalmente estresante, tiene una tasa de éxito baja y puede provocar embarazos múltiples, que conllevan riesgos para la salud.")
+  ], table:{ head:[["Hormone","Hormona"],["Made in","Se produce en"],["Role in the menstrual cycle","Función en el ciclo menstrual"]], rows:[
+   [["FSH",""],["Pituitary gland","Glándula pituitaria (hipófisis)"],["Causes an egg to mature in the ovary; stimulates the ovaries to produce oestrogen","Hace que un óvulo madure en el ovario; estimula a los ovarios a producir estrógeno"]],
+   [["LH",""],["Pituitary gland","Glándula pituitaria (hipófisis)"],["Stimulates the release of the egg (ovulation)","Estimula la liberación del óvulo (ovulación)"]],
+   [["Oestrogen","Estrógeno"],["Ovaries","Ovarios"],["Causes the lining of the uterus to grow and repair","Hace que el revestimiento del útero crezca y se repare"]],
+   [["Progesterone","Progesterona"],["Ovaries","Ovarios"],["Maintains the lining of the uterus","Mantiene el revestimiento del útero"]]
+  ]} },
+
+ { id:"plants", points:[
+   b("Plants respond to stimuli with growth responses called <strong>tropisms</strong>. Growing towards a stimulus is positive; growing away is negative.",
+     "Las plantas responden a los estímulos con respuestas de crecimiento llamadas <strong>tropismos</strong>. Crecer hacia el estímulo es positivo; crecer alejándose de él es negativo."),
+   b("<strong>Auxin</strong> is made in the shoot tip and moves to the shaded side. It makes cells there elongate faster, so the shoot bends <strong>towards light</strong> (positive phototropism).",
+     "La <strong>auxina</strong> se produce en el ápice del tallo y se desplaza hacia el lado sombreado. Hace que las células de ese lado se alarguen más rápido, de modo que el tallo se curva <strong>hacia la luz</strong> (fototropismo positivo)."),
+   b("In roots, auxin collects on the lower side and <strong>inhibits</strong> cell elongation, so the root bends downwards (positive gravitropism). Shoots show negative gravitropism.",
+     "En las raíces, la auxina se acumula en el lado inferior e <strong>inhibe</strong> el alargamiento celular, por lo que la raíz se curva hacia abajo (gravitropismo positivo). Los tallos muestran gravitropismo negativo."),
+   b("<strong>Gibberellins</strong> help start seed germination (and can promote flowering and larger fruit). <strong>Ethene</strong> controls cell division and the ripening of fruits.",
+     "Las <strong>giberelinas</strong> ayudan a iniciar la germinación de las semillas (y pueden favorecer la floración y frutos más grandes). El <strong>eteno</strong> controla la división celular y la maduración de los frutos."),
+   b("<strong>Uses:</strong> auxins as selective weedkillers and in rooting powder for cuttings; ethene to ripen fruit during transport and storage; gibberellins to end seed dormancy and increase fruit size.",
+     "<strong>Usos:</strong> las auxinas como herbicidas selectivos y en polvo de enraizamiento para esquejes; el eteno para madurar frutos durante el transporte y el almacenamiento; las giberelinas para terminar la latencia de las semillas y aumentar el tamaño de los frutos.")
+  ], flowLabel:["Phototropism","Fototropismo"],
+  flow:[["Light from one side","Luz desde un lado"],["Auxin moves to shaded side","La auxina se desplaza al lado sombreado"],["Shaded cells elongate more","Las células sombreadas se alargan más"],["Shoot bends towards light","El tallo se curva hacia la luz"]] }
+];
+
+/* [term en, term es, definition en, definition es, topic] */
+const cards = [
+ ["Homeostasis","Homeostasis","Regulation of the internal conditions of a cell or organism to maintain optimum conditions for function.","Regulación de las condiciones internas de una célula o un organismo para mantener las condiciones óptimas de funcionamiento.","principles"],
+ ["Stimulus","Estímulo","A change in the environment that is detected by a receptor.","Un cambio en el entorno que es detectado por un receptor.","principles"],
+ ["Receptor","Receptor","Detects a stimulus.","Detecta un estímulo.","principles"],
+ ["Coordination centre","Centro de coordinación","Receives and processes information from receptors and sends out instructions (e.g. brain, spinal cord, pancreas).","Recibe y procesa la información de los receptores y envía instrucciones (p. ej. el cerebro, la médula espinal, el páncreas).","principles"],
+ ["Effector","Efector","A muscle or gland that brings about a response.","Un músculo o una glándula que produce una respuesta.","principles"],
+ ["Negative feedback","Retroalimentación negativa","A change is detected and the response reverses it, returning the condition to normal.","Se detecta un cambio y la respuesta lo revierte, devolviendo la condición a la normalidad.","principles"],
+ ["CNS","SNC (sistema nervioso central)","Central nervous system: the brain and spinal cord.","Sistema nervioso central: el cerebro y la médula espinal.","nervous"],
+ ["Sensory neurone","Neurona sensorial","Carries impulses from receptors to the CNS.","Lleva los impulsos de los receptores al SNC.","nervous"],
+ ["Relay neurone","Neurona de relevo","Connects sensory and motor neurones inside the CNS.","Conecta las neuronas sensoriales y motoras dentro del SNC.","nervous"],
+ ["Motor neurone","Neurona motora","Carries impulses from the CNS to effectors.","Lleva los impulsos del SNC a los efectores.","nervous"],
+ ["Reflex action","Acto reflejo","An automatic, rapid response that does not involve the conscious brain and protects the body from harm.","Una respuesta automática y rápida que no involucra al cerebro consciente y protege al cuerpo del daño.","nervous"],
+ ["Synapse","Sinapsis","The gap between two neurones.","El espacio entre dos neuronas.","nervous"],
+ ["Neurotransmitter","Neurotransmisor","A chemical released at a synapse that diffuses across the gap and triggers an impulse in the next neurone.","Una sustancia química liberada en una sinapsis que se difunde por el espacio y desencadena un impulso en la siguiente neurona.","nervous"],
+ ["Reaction time","Tiempo de reacción","The time taken to respond to a stimulus. In the ruler drop test, a shorter distance caught means a faster reaction time.","El tiempo que se tarda en responder a un estímulo. En la prueba de la regla, una distancia menor significa un tiempo de reacción más rápido.","nervous"],
+ ["Hormone","Hormona","A chemical messenger secreted by a gland into the blood.","Un mensajero químico secretado por una glándula en la sangre.","endocrine"],
+ ["Endocrine gland","Glándula endocrina","A gland that secretes hormones directly into the bloodstream.","Una glándula que secreta hormonas directamente en el torrente sanguíneo.","endocrine"],
+ ["Pituitary gland","Glándula pituitaria (hipófisis)","The 'master gland' in the brain. Its hormones act on other glands.","La «glándula maestra» del cerebro. Sus hormonas actúan sobre otras glándulas.","endocrine"],
+ ["Target organ","Órgano diana","An organ that responds to a particular hormone.","Un órgano que responde a una hormona determinada.","endocrine"],
+ ["Insulin","Insulina","Hormone from the pancreas that lowers blood glucose: glucose moves into cells and is stored as glycogen.","Hormona del páncreas que reduce la glucosa en sangre: la glucosa entra en las células y se almacena como glucógeno.","glucose"],
+ ["Glucagon","Glucagón","Hormone from the pancreas that raises blood glucose: the liver converts glycogen to glucose.","Hormona del páncreas que aumenta la glucosa en sangre: el hígado convierte el glucógeno en glucosa.","glucose"],
+ ["Glycogen","Glucógeno","The storage form of glucose, kept in the liver and muscles.","La forma de almacenamiento de la glucosa, que se guarda en el hígado y los músculos.","glucose"],
+ ["Type 1 diabetes","Diabetes tipo 1","The pancreas produces little or no insulin. Treated with insulin injections.","El páncreas produce poca o ninguna insulina. Se trata con inyecciones de insulina.","glucose"],
+ ["Type 2 diabetes","Diabetes tipo 2","Body cells no longer respond properly to insulin. Linked to obesity. Treated with diet and exercise.","Las células del cuerpo ya no responden bien a la insulina. Se relaciona con la obesidad. Se trata con dieta y ejercicio.","glucose"],
+ ["Testosterone","Testosterona","Main male reproductive hormone, made in the testes. Stimulates sperm production.","Principal hormona reproductiva masculina, producida en los testículos. Estimula la producción de espermatozoides.","repro"],
+ ["Oestrogen","Estrógeno","Main female reproductive hormone, made in the ovaries. Causes the uterus lining to grow.","Principal hormona reproductiva femenina, producida en los ovarios. Hace crecer el revestimiento del útero.","repro"],
+ ["FSH","FSH (hormona foliculoestimulante)","From the pituitary. Causes an egg to mature and stimulates oestrogen production.","Procede de la hipófisis. Hace madurar un óvulo y estimula la producción de estrógeno.","repro"],
+ ["LH","LH (hormona luteinizante)","From the pituitary. Stimulates ovulation (release of the egg).","Procede de la hipófisis. Estimula la ovulación (liberación del óvulo).","repro"],
+ ["Progesterone","Progesterona","Made in the ovaries. Maintains the lining of the uterus.","Se produce en los ovarios. Mantiene el revestimiento del útero.","repro"],
+ ["Ovulation","Ovulación","The release of a mature egg from an ovary, around day 14 of the cycle.","La liberación de un óvulo maduro de un ovario, alrededor del día 14 del ciclo.","repro"],
+ ["IVF","FIV (fecundación in vitro)","In vitro fertilisation: eggs are collected, fertilised in a lab, and one or two embryos are placed in the uterus.","Fecundación in vitro: se extraen los óvulos, se fecundan en el laboratorio y se colocan uno o dos embriones en el útero.","repro"],
+ ["Tropism","Tropismo","A plant growth response to a stimulus, towards (positive) or away from (negative) it.","Una respuesta de crecimiento de una planta a un estímulo, hacia él (positivo) o alejándose de él (negativo).","plants"],
+ ["Auxin","Auxina","Plant hormone that controls elongation of cells, causing phototropism and gravitropism.","Hormona vegetal que controla el alargamiento de las células y provoca el fototropismo y el gravitropismo.","plants"],
+ ["Gibberellins","Giberelinas","Plant hormones that help start seed germination.","Hormonas vegetales que ayudan a iniciar la germinación de las semillas.","plants"],
+ ["Ethene","Eteno","Plant hormone that controls cell division and the ripening of fruit.","Hormona vegetal que controla la división celular y la maduración de los frutos.","plants"]
+];
+
+/* Each question: o = options as [en, es]; the FIRST option is always the correct one (options are shuffled when the quiz runs). e = [en, es] explanation. */
+const quiz = [
+ {t:"principles",q:["Which part of a control system detects a stimulus?","¿Qué parte de un sistema de control detecta un estímulo?"],o:[["Receptor","Receptor"],["Effector","Efector"],["Coordination centre","Centro de coordinación"],["Hormone","Hormona"]],e:["Receptors detect stimuli. Coordination centres process the information and effectors respond.","Los receptores detectan los estímulos. Los centros de coordinación procesan la información y los efectores responden."]},
+ {t:"principles",q:["Which of these can act as an effector?","¿Cuál de estos puede actuar como efector?"],o:[["A muscle","Un músculo"],["A sensory neurone","Una neurona sensorial"],["The spinal cord","La médula espinal"],["A receptor cell in the skin","Una célula receptora de la piel"]],e:["Effectors are muscles or glands. The spinal cord is a coordination centre.","Los efectores son músculos o glándulas. La médula espinal es un centro de coordinación."]},
+ {t:"principles",q:["What does negative feedback do?","¿Qué hace la retroalimentación negativa?"],o:[["Reverses a change so the condition returns to normal","Revierte un cambio para que la condición vuelva a la normalidad"],["Makes a change bigger","Hace mayor el cambio"],["Stops the body responding to changes","Impide que el cuerpo responda a los cambios"],["Keeps conditions constantly changing","Mantiene las condiciones en cambio constante"]],e:["Negative feedback counteracts a change and brings the condition back to its normal level.","La retroalimentación negativa contrarresta un cambio y devuelve la condición a su nivel normal."]},
+ {t:"nervous",q:["What is the central nervous system made up of?","¿De qué está formado el sistema nervioso central?"],o:[["The brain and spinal cord","El cerebro y la médula espinal"],["The brain and sensory neurones","El cerebro y las neuronas sensoriales"],["The spinal cord and motor neurones","La médula espinal y las neuronas motoras"],["Receptors and effectors","Los receptores y los efectores"]],e:["The CNS is the brain and spinal cord.","El SNC es el cerebro y la médula espinal."]},
+ {t:"nervous",q:["Which is the correct order for a reflex arc?","¿Cuál es el orden correcto de un arco reflejo?"],o:[["Receptor, sensory neurone, relay neurone, motor neurone, effector","Receptor, neurona sensorial, neurona de relevo, neurona motora, efector"],["Receptor, motor neurone, relay neurone, sensory neurone, effector","Receptor, neurona motora, neurona de relevo, neurona sensorial, efector"],["Effector, sensory neurone, relay neurone, motor neurone, receptor","Efector, neurona sensorial, neurona de relevo, neurona motora, receptor"],["Receptor, relay neurone, sensory neurone, motor neurone, effector","Receptor, neurona de relevo, neurona sensorial, neurona motora, efector"]],e:["Sensory neurones carry the impulse to the CNS, relay neurones pass it on, and motor neurones carry it to the effector.","Las neuronas sensoriales llevan el impulso al SNC, las neuronas de relevo lo transmiten y las neuronas motoras lo llevan al efector."]},
+ {t:"nervous",q:["What crosses a synapse?","¿Qué atraviesa una sinapsis?"],o:[["Neurotransmitter chemicals diffusing across the gap","Neurotransmisores que se difunden por el espacio"],["An electrical impulse jumping across the gap","Un impulso eléctrico que salta el espacio"],["Hormones carried in the blood","Hormonas transportadas por la sangre"],["The sensory neurone itself","La propia neurona sensorial"]],e:["The electrical impulse triggers neurotransmitter release. The chemical diffuses across and starts a new impulse.","El impulso eléctrico desencadena la liberación del neurotransmisor. La sustancia química se difunde y inicia un nuevo impulso."]},
+ {t:"nervous",q:["In the ruler drop test, a student catches the ruler after a shorter distance. What does this show?","En la prueba de la regla, un estudiante atrapa la regla tras una distancia menor. ¿Qué indica esto?"],o:[["A faster reaction time","Un tiempo de reacción más rápido"],["A slower reaction time","Un tiempo de reacción más lento"],["The result is invalid","El resultado no es válido"],["Their reaction time has not changed","Su tiempo de reacción no ha cambiado"]],e:["The less the ruler falls before it is caught, the faster the reaction.","Cuanto menos cae la regla antes de ser atrapada, más rápida es la reacción."]},
+ {t:"nervous",q:["Why are reflex actions useful?","¿Por qué son útiles los actos reflejos?"],o:[["They are fast and automatic, so they protect the body from harm","Son rápidos y automáticos, por lo que protegen al cuerpo del daño"],["They are slow but very accurate","Son lentos pero muy precisos"],["They need careful conscious thought","Necesitan pensamiento consciente cuidadoso"],["They are controlled by hormones","Están controlados por hormonas"]],e:["Reflexes bypass the conscious brain, so the response is rapid.","Los reflejos no pasan por el cerebro consciente, por lo que la respuesta es rápida."]},
+ {t:"endocrine",q:["How are hormones carried to their target organs?","¿Cómo se transportan las hormonas hasta sus órganos diana?"],o:[["In the blood","En la sangre"],["Along neurones","Por las neuronas"],["Through the spinal cord","A través de la médula espinal"],["By diffusion through the air","Por difusión a través del aire"]],e:["Endocrine glands secrete hormones directly into the bloodstream.","Las glándulas endocrinas secretan las hormonas directamente en el torrente sanguíneo."]},
+ {t:"endocrine",q:["Compared with the nervous system, the effects of hormones are usually:","En comparación con el sistema nervioso, los efectos de las hormonas suelen ser:"],o:[["Slower and longer-lasting","Más lentos y más duraderos"],["Faster and shorter-lasting","Más rápidos y menos duraderos"],["Faster and longer-lasting","Más rápidos y más duraderos"],["Slower and shorter-lasting","Más lentos y menos duraderos"]],e:["Hormones travel in the blood, so they act more slowly, but their effects last longer.","Las hormonas viajan por la sangre, por lo que actúan más despacio, pero sus efectos duran más."]},
+ {t:"endocrine",q:["Which gland is known as the 'master gland'?","¿Qué glándula se conoce como la «glándula maestra»?"],o:[["Pituitary gland","Glándula pituitaria (hipófisis)"],["Pancreas","Páncreas"],["Ovary","Ovario"],["Testis","Testículo"]],e:["The pituitary secretes hormones that act on other glands.","La hipófisis secreta hormonas que actúan sobre otras glándulas."]},
+ {t:"glucose",q:["Blood glucose rises after a meal. Which hormone is released?","La glucosa en sangre sube después de una comida. ¿Qué hormona se libera?"],o:[["Insulin","Insulina"],["Glucagon","Glucagón"],["Oestrogen","Estrógeno"],["FSH","FSH"]],e:["The pancreas releases insulin, which lowers blood glucose.","El páncreas libera insulina, que reduce la glucosa en sangre."]},
+ {t:"glucose",q:["What is the effect of glucagon?","¿Cuál es el efecto del glucagón?"],o:[["The liver converts glycogen to glucose","El hígado convierte el glucógeno en glucosa"],["Glucose is stored as glycogen","La glucosa se almacena como glucógeno"],["Body cells take up more glucose","Las células del cuerpo absorben más glucosa"],["The pancreas stops working","El páncreas deja de funcionar"]],e:["Glucagon raises blood glucose by causing glycogen to be broken down to glucose in the liver.","El glucagón aumenta la glucosa en sangre al hacer que el glucógeno se descomponga en glucosa en el hígado."]},
+ {t:"glucose",q:["What causes type 1 diabetes?","¿Qué causa la diabetes tipo 1?"],o:[["The pancreas does not produce enough insulin","El páncreas no produce suficiente insulina"],["Body cells stop responding to insulin","Las células del cuerpo dejan de responder a la insulina"],["Eating too much sugar","Comer demasiado azúcar"],["Too much glucagon","Demasiado glucagón"]],e:["In type 1 diabetes the pancreas produces little or no insulin.","En la diabetes tipo 1 el páncreas produce poca o ninguna insulina."]},
+ {t:"glucose",q:["Which is a risk factor for type 2 diabetes?","¿Cuál es un factor de riesgo de la diabetes tipo 2?"],o:[["Obesity","Obesidad"],["Being underweight","Tener bajo peso"],["Regular exercise","Hacer ejercicio con regularidad"],["A carbohydrate-controlled diet","Una dieta con control de carbohidratos"]],e:["Obesity is a major risk factor. Diet and exercise help to manage type 2 diabetes.","La obesidad es un factor de riesgo importante. La dieta y el ejercicio ayudan a controlar la diabetes tipo 2."]},
+ {t:"repro",q:["Which hormone stimulates the release of an egg?","¿Qué hormona estimula la liberación de un óvulo?"],o:[["LH","LH"],["FSH","FSH"],["Progesterone","Progesterona"],["Testosterone","Testosterona"]],e:["LH stimulates ovulation. FSH causes the egg to mature.","La LH estimula la ovulación. La FSH hace que el óvulo madure."]},
+ {t:"repro",q:["What is the role of progesterone in the menstrual cycle?","¿Cuál es la función de la progesterona en el ciclo menstrual?"],o:[["It maintains the lining of the uterus","Mantiene el revestimiento del útero"],["It makes an egg mature","Hace que un óvulo madure"],["It stimulates the release of an egg","Estimula la liberación de un óvulo"],["It stimulates sperm production","Estimula la producción de espermatozoides"]],e:["Progesterone keeps the uterus lining in place.","La progesterona mantiene el revestimiento del útero en su lugar."]},
+ {t:"repro",q:["Which hormone is produced by the testes?","¿Qué hormona producen los testículos?"],o:[["Testosterone","Testosterona"],["Oestrogen","Estrógeno"],["FSH","FSH"],["Progesterone","Progesterona"]],e:["Testosterone is the main male reproductive hormone.","La testosterona es la principal hormona reproductiva masculina."]},
+ {t:"repro",q:["How does the oral contraceptive pill help prevent pregnancy?","¿Cómo ayuda la píldora anticonceptiva oral a prevenir el embarazo?"],o:[["It stops FSH being produced, so eggs do not mature","Impide que se produzca FSH, por lo que los óvulos no maduran"],["It kills sperm in the vagina","Mata los espermatozoides en la vagina"],["It physically blocks sperm","Bloquea físicamente los espermatozoides"],["It stimulates LH to release more eggs","Estimula la LH para liberar más óvulos"]],e:["The pill contains oestrogen and progesterone, which inhibit FSH.","La píldora contiene estrógeno y progesterona, que inhiben la FSH."]},
+ {t:"repro",q:["Which is a disadvantage of IVF?","¿Cuál es una desventaja de la FIV?"],o:[["It has a low success rate and can be stressful","Tiene una tasa de éxito baja y puede ser estresante"],["It does not use hormones","No utiliza hormonas"],["It always results in a single baby","Siempre da lugar a un solo bebé"],["It is always successful","Siempre tiene éxito"]],e:["IVF can be physically and emotionally stressful, has a low success rate and can cause multiple births.","La FIV puede ser física y emocionalmente estresante, tiene una tasa de éxito baja y puede provocar partos múltiples."]},
+ {t:"plants",q:["Which hormone makes a shoot grow towards light?","¿Qué hormona hace que un tallo crezca hacia la luz?"],o:[["Auxin","Auxina"],["Gibberellin","Giberelina"],["Ethene","Eteno"],["Insulin","Insulina"]],e:["Auxin causes cell elongation on the shaded side, bending the shoot towards light.","La auxina provoca el alargamiento celular en el lado sombreado, curvando el tallo hacia la luz."]},
+ {t:"plants",q:["Light shines on a shoot from the right. What happens to auxin?","La luz incide sobre un tallo desde la derecha. ¿Qué le ocurre a la auxina?"],o:[["It moves to the shaded (left) side, where cells elongate more","Se desplaza al lado sombreado (izquierdo), donde las células se alargan más"],["It moves to the lit (right) side, where cells elongate more","Se desplaza al lado iluminado (derecho), donde las células se alargan más"],["It is destroyed on the shaded side","Se destruye en el lado sombreado"],["It stays at the tip and cells do not change","Se queda en el ápice y las células no cambian"]],e:["Auxin accumulates on the shaded side, so cells there grow longer.","La auxina se acumula en el lado sombreado, por lo que las células de ese lado se alargan más."]},
+ {t:"plants",q:["What is ethene used for in agriculture?","¿Para qué se usa el eteno en la agricultura?"],o:[["Ripening fruit","Madurar frutos"],["Ending seed dormancy","Terminar la latencia de las semillas"],["Killing weeds","Eliminar malas hierbas"],["Making cuttings grow roots","Hacer que los esquejes enraícen"]],e:["Ethene controls ripening, so it can be used to ripen fruit during transport and storage.","El eteno controla la maduración, por lo que se puede usar para madurar frutos durante el transporte y el almacenamiento."]},
+ {t:"plants",q:["Which plant hormone is found in rooting powder?","¿Qué hormona vegetal se encuentra en el polvo de enraizamiento?"],o:[["Auxin","Auxina"],["Ethene","Eteno"],["Gibberellin","Giberelina"],["Insulin","Insulina"]],e:["Auxin encourages roots to grow from cuttings.","La auxina favorece que crezcan raíces en los esquejes."]}
+];
+
+/* a = mark scheme points as [en, es]; n = optional note as [en, es] */
+const exam = [
+ {t:"principles",m:2,q:["Define homeostasis.","Define la homeostasis."],a:[["Regulation of the internal conditions of a cell or organism (1)","Regulación de las condiciones internas de una célula o un organismo (1)"],["to maintain optimum conditions for function / enzyme action, in response to internal and external changes (1)","para mantener las condiciones óptimas de funcionamiento / acción enzimática, en respuesta a cambios internos y externos (1)"]]},
+ {t:"nervous",m:4,q:["A person steps on a sharp object and pulls their foot away. Describe the pathway of this reflex action.","Una persona pisa un objeto afilado y retira el pie. Describe la vía de este acto reflejo."],a:[["Receptors in the skin detect the stimulus (1)","Los receptores de la piel detectan el estímulo (1)"],["Impulse carried by a sensory neurone to the CNS (1)","Una neurona sensorial lleva el impulso al SNC (1)"],["Relay neurone in the spinal cord passes the impulse on (1)","Una neurona de relevo de la médula espinal transmite el impulso (1)"],["Motor neurone carries the impulse to an effector (muscle) (1)","Una neurona motora lleva el impulso a un efector (músculo) (1)"],["Muscle contracts, pulling the foot away (1)","El músculo se contrae y retira el pie (1)"]],n:["Maximum 4 marks.","Máximo 4 puntos."]},
+ {t:"nervous",m:3,q:["Describe how an impulse passes across a synapse.","Describe cómo pasa un impulso a través de una sinapsis."],a:[["Neurotransmitter / chemical is released from the first neurone (1)","Se libera un neurotransmisor / sustancia química desde la primera neurona (1)"],["It diffuses across the gap (1)","Se difunde por el espacio (1)"],["It binds to receptor molecules on the next neurone, starting a new electrical impulse (1)","Se une a moléculas receptoras de la siguiente neurona, iniciando un nuevo impulso eléctrico (1)"]]},
+ {t:"nervous",m:3,q:["A student did the ruler drop test five times. The distances caught were 12 cm, 15 cm, 11 cm, 14 cm and 13 cm. Calculate the mean distance, and suggest one way to make the results more reliable.","Un estudiante hizo la prueba de la regla cinco veces. Las distancias a las que la atrapó fueron 12 cm, 15 cm, 11 cm, 14 cm y 13 cm. Calcula la distancia media y sugiere una forma de hacer los resultados más fiables."],a:[["Total = 65 (1)","Total = 65 (1)"],["Mean = 65 ÷ 5 = 13 cm (1)","Media = 65 ÷ 5 = 13 cm (1)"],["Repeat more times / use more people and recalculate the mean (1)","Repetir más veces / usar más personas y volver a calcular la media (1)"]]},
+ {t:"endocrine",m:3,q:["Describe two differences between the nervous system and the hormonal system.","Describe dos diferencias entre el sistema nervioso y el sistema hormonal."],a:[["Nervous: electrical impulses; hormonal: chemical messengers in the blood (1)","Nervioso: impulsos eléctricos; hormonal: mensajeros químicos en la sangre (1)"],["Nervous: fast response; hormonal: slower response (1)","Nervioso: respuesta rápida; hormonal: respuesta más lenta (1)"],["Nervous: short-lived effect; hormonal: longer-lasting effect (1)","Nervioso: efecto de corta duración; hormonal: efecto más duradero (1)"]],n:["Any two differences, 1 mark each, plus 1 mark for clear comparison. Maximum 3 marks.","Cualesquiera dos diferencias, 1 punto cada una, más 1 punto por una comparación clara. Máximo 3 puntos."]},
+ {t:"glucose",m:4,q:["Explain how the body lowers blood glucose concentration after a meal.","Explica cómo reduce el cuerpo la concentración de glucosa en sangre después de una comida."],a:[["The pancreas detects the high blood glucose (1)","El páncreas detecta la glucosa alta en sangre (1)"],["The pancreas releases insulin (1)","El páncreas libera insulina (1)"],["Insulin causes glucose to move from the blood into cells (1)","La insulina hace que la glucosa pase de la sangre a las células (1)"],["The liver and muscles convert excess glucose to glycogen for storage (1)","El hígado y los músculos convierten el exceso de glucosa en glucógeno para almacenarlo (1)"]]},
+ {t:"glucose",m:3,q:["Compare type 1 and type 2 diabetes.","Compara la diabetes tipo 1 y la diabetes tipo 2."],a:[["Type 1: pancreas produces little or no insulin; type 2: body cells no longer respond to insulin (1)","Tipo 1: el páncreas produce poca o ninguna insulina; tipo 2: las células del cuerpo ya no responden a la insulina (1)"],["Type 1 treated with insulin injections; type 2 treated with diet and exercise (1)","El tipo 1 se trata con inyecciones de insulina; el tipo 2 se trata con dieta y ejercicio (1)"],["Obesity is a risk factor for type 2 (1)","La obesidad es un factor de riesgo del tipo 2 (1)"]]},
+ {t:"repro",m:4,q:["Describe the roles of FSH and LH in the menstrual cycle.","Describe las funciones de la FSH y la LH en el ciclo menstrual."],a:[["Both are produced by the pituitary gland (1)","Ambas se producen en la glándula pituitaria (hipófisis) (1)"],["FSH causes an egg to mature in the ovary (1)","La FSH hace que un óvulo madure en el ovario (1)"],["FSH stimulates the ovaries to produce oestrogen (1)","La FSH estimula a los ovarios a producir estrógeno (1)"],["LH stimulates the release of the egg (ovulation) (1)","La LH estimula la liberación del óvulo (ovulación) (1)"]]},
+ {t:"repro",m:4,q:["Some couples use IVF to have a baby. Evaluate the use of IVF.","Algunas parejas usan la FIV para tener un bebé. Evalúa el uso de la FIV."],a:[["Advantage: helps couples who cannot conceive naturally to have a baby (1)","Ventaja: ayuda a las parejas que no pueden concebir de forma natural a tener un bebé (1)"],["Hormones (FSH and LH) are given to stimulate several eggs to mature, which makes success more likely (1)","Se administran hormonas (FSH y LH) para estimular la maduración de varios óvulos, lo que hace más probable el éxito (1)"],["Disadvantage: physically and emotionally stressful (1)","Desventaja: es física y emocionalmente estresante (1)"],["Low success rate / can result in multiple births, which carry health risks (1)","Tasa de éxito baja / puede dar lugar a partos múltiples, que conllevan riesgos para la salud (1)"]]},
+ {t:"plants",m:4,q:["Explain why a shoot grows towards a light source.","Explica por qué un tallo crece hacia una fuente de luz."],a:[["Auxin is produced in the shoot tip (1)","La auxina se produce en el ápice del tallo (1)"],["Auxin moves to the shaded side of the shoot (1)","La auxina se desplaza al lado sombreado del tallo (1)"],["Cells on the shaded side elongate faster / more (1)","Las células del lado sombreado se alargan más rápido / más (1)"],["So the shoot bends towards the light (1)","Por tanto, el tallo se curva hacia la luz (1)"]]},
+ {t:"plants",m:3,q:["Give three uses of plant hormones in agriculture or horticulture.","Da tres usos de las hormonas vegetales en la agricultura o la horticultura."],a:[["Auxin: selective weedkiller (1)","Auxina: herbicida selectivo (1)"],["Auxin: rooting powder for cuttings (1)","Auxina: polvo de enraizamiento para esquejes (1)"],["Ethene: ripening fruit during transport or storage (1)","Eteno: maduración de frutos durante el transporte o el almacenamiento (1)"],["Gibberellins: ending seed dormancy / increasing fruit size (1)","Giberelinas: terminar la latencia de las semillas / aumentar el tamaño de los frutos (1)"]],n:["Any three, 1 mark each.","Cualesquiera tres, 1 punto cada una."]}
+];
+
+const $ = (s,r=document)=>r.querySelector(s);
+const el = (tag,cls,html)=>{const e=document.createElement(tag); if(cls)e.className=cls; if(html!==undefined)e.innerHTML=html; return e;};
+const shuffle = a=>{a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;};
+
+/* Spanish toggle */
+const esBtn = $('#esToggle');
+const PH_EN = 'Write your answer here';
+const PH_BOTH = 'Write your answer here / Escribe tu respuesta aquí';
+function setEs(on){
+  document.body.classList.toggle('es-on', on);
+  esBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  document.querySelectorAll('textarea').forEach(t=>{t.placeholder = on ? PH_BOTH : PH_EN;});
+  try{ localStorage.setItem('homeostasis-es', on ? '1' : '0'); }catch(e){}
+}
+esBtn.addEventListener('click',()=>setEs(!document.body.classList.contains('es-on')));
+
+/* Tabs */
+document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===btn));
+  ['notes','cards','quiz','exam'].forEach(id=>$('#'+id).hidden = id!==btn.dataset.tab);
+  window.scrollTo({top:0});
+}));
+
+/* Topic filter chips */
+function makeFilter(host,onPick){
+  const items=[['all',b('All topics','Todos los temas')],...Object.keys(T).map(k=>[k,TT(k)])];
+  items.forEach(([k,label],i)=>{
+    const c=el('button','chip'+(i===0?' on':''),label); c.type='button'; c.dataset.k=k;
+    c.addEventListener('click',()=>{host.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c)); onPick(k);});
+    host.appendChild(c);
+  });
+}
+
+/* Notes */
+(function(){
+  const host=$('#notes');
+  const jump=el('div','chips no-print');
+  notes.forEach(n=>{const a=el('a','chip',TT(n.id)); a.href='#n-'+n.id; jump.appendChild(a);});
+  const pr=el('button','chip',b('Print notes','Imprimir apuntes')); pr.type='button'; pr.addEventListener('click',()=>window.print()); jump.appendChild(pr);
+  host.appendChild(jump);
+  notes.forEach(n=>{
+    const c=el('div','card'); c.id='n-'+n.id;
+    c.appendChild(el('h2','',TT(n.id)));
+    const ul=el('ul'); n.points.forEach(p=>ul.appendChild(el('li','',p))); c.appendChild(ul);
+    if(n.flow){
+      c.appendChild(el('p','flowlabel',b(n.flowLabel[0],n.flowLabel[1])));
+      const f=el('div','flow');
+      n.flow.forEach((s,i)=>{ if(i)f.appendChild(el('span','arr','→')); f.appendChild(el('span','step',b(s[0],s[1]))); });
+      c.appendChild(f);
+    }
+    if(n.table){
+      const t=el('table'); const th=el('tr');
+      n.table.head.forEach(h=>th.appendChild(el('th','',b(h[0],h[1])))); t.appendChild(th);
+      n.table.rows.forEach(r=>{const tr=el('tr'); r.forEach(x=>tr.appendChild(el('td','',b(x[0],x[1])))); t.appendChild(tr);});
+      c.appendChild(t);
+    }
+    host.appendChild(c);
+  });
+})();
+
+/* Flashcards */
+let deck=[],fi=0,flipped=false;
+function setDeck(k){deck=shuffle(cards.filter(c=>k==='all'||c[4]===k)); fi=0; flipped=false; drawCard();}
+function drawCard(){
+  const c=deck[fi], bt=$('#fc');
+  bt.className='fc'+(flipped?' back':'');
+  bt.innerHTML='<span class="side">'+(flipped?b('Definition','Definición'):b('Term','Término'))+'</span>'+
+               '<span class="side">'+TT(c[4])+'</span>'+
+               '<span class="txt">'+(flipped?b(c[2],c[3]):b(c[0],c[1]))+'</span>';
+  $('#fcCount').innerHTML=b((fi+1)+' of '+deck.length,(fi+1)+' de '+deck.length);
+}
+$('#fc').addEventListener('click',()=>{flipped=!flipped; drawCard();});
+$('#fcNext').addEventListener('click',()=>{fi=(fi+1)%deck.length; flipped=false; drawCard();});
+$('#fcPrev').addEventListener('click',()=>{fi=(fi-1+deck.length)%deck.length; flipped=false; drawCard();});
+$('#fcShuffle').addEventListener('click',()=>{deck=shuffle(deck); fi=0; flipped=false; drawCard();});
+makeFilter($('#cardFilter'),setDeck);
+setDeck('all');
+
+/* Quiz */
+let qs=[],qi=0,score=0,missed={},qFilter='all';
+function startQuiz(k){
+  qFilter=k; qi=0; score=0; missed={};
+  qs=shuffle(quiz.filter(q=>k==='all'||q.t===k)).map(q=>({...q,opts:shuffle(q.o.map((p,i)=>({html:b(p[0],p[1]),ok:i===0})))}));
+  drawQ();
+}
+function drawQ(){
+  const host=$('#quizBody'); host.innerHTML='';
+  if(qi>=qs.length){
+    const c=el('div','card');
+    const pct=Math.round(score/qs.length*100);
+    c.appendChild(el('p','score',score+' / '+qs.length+' ('+pct+'%)'));
+    const keys=Object.keys(missed);
+    if(keys.length){
+      c.appendChild(el('p','',b('Topics to revisit:','Temas para repasar:')));
+      const ul=el('ul');
+      keys.forEach(k=>ul.appendChild(el('li','',b(T[k][0]+' ('+missed[k]+' missed)',T[k][1]+' ('+missed[k]+(missed[k]===1?' fallada)':' falladas)')))));
+      c.appendChild(ul);
+    } else c.appendChild(el('p','',b('Full marks. Try the exam questions next.','Puntuación perfecta. Prueba ahora las preguntas de examen.')));
+    const r=el('div','row'); const bt=el('button','btn primary',b('Try again','Intentar de nuevo')); bt.addEventListener('click',()=>startQuiz(qFilter)); r.appendChild(bt); c.appendChild(r);
+    host.appendChild(c); return;
+  }
+  const q=qs[qi];
+  const bar=el('div','bar'); bar.appendChild(el('span')); bar.firstChild.style.width=(qi/qs.length*100)+'%'; host.appendChild(bar);
+  const c=el('div','card');
+  c.appendChild(el('p','muted',b('Question '+(qi+1)+' of '+qs.length,'Pregunta '+(qi+1)+' de '+qs.length)));
+  c.appendChild(el('p','','<span class="tag">'+TT(q.t)+'</span>'));
+  c.appendChild(el('h2','',b(q.q[0],q.q[1])));
+  const fbHost=el('div');
+  q.opts.forEach(o=>{
+    const bt=el('button','opt',o.html); bt.type='button';
+    bt.addEventListener('click',()=>{
+      c.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+      c.querySelectorAll('.opt').forEach((x,i)=>{ if(q.opts[i].ok)x.classList.add('ok'); });
+      if(o.ok){score++;} else {bt.classList.add('no'); missed[q.t]=(missed[q.t]||0)+1;}
+      const verdict = o.ok ? b('Correct. ','Correcto. ') : b('Not quite. ','No exactamente. ');
+      fbHost.appendChild(el('div','fb',(o.ok?'Correct. ':'Not quite. ')+q.e[0]+'<span class="es" lang="es">'+(o.ok?'Correcto. ':'No exactamente. ')+q.e[1]+'</span>'));
+      const nx=el('button','btn primary',qi+1<qs.length?b('Next question','Siguiente pregunta'):b('See score','Ver puntuación')); nx.addEventListener('click',()=>{qi++; drawQ();});
+      fbHost.appendChild(nx); nx.focus();
+    });
+    c.appendChild(bt);
+  });
+  c.appendChild(fbHost);
+  host.appendChild(c);
+}
+makeFilter($('#quizFilter'),startQuiz);
+startQuiz('all');
+
+/* Exam questions */
+(function(){
+  const host=$('#examBody');
+  exam.forEach((x,i)=>{
+    const c=el('div','card');
+    c.appendChild(el('p','', '<span class="tag">'+TT(x.t)+'</span><span class="marks">'+b(x.m+' mark'+(x.m>1?'s':''),x.m+' punto'+(x.m>1?'s':''))+'</span>'));
+    c.appendChild(el('p','', '<strong>'+(i+1)+'.</strong> '+b(x.q[0],x.q[1])));
+    const ta=el('textarea'); ta.placeholder=PH_EN; ta.setAttribute('aria-label','Your answer to question '+(i+1)+' / Tu respuesta a la pregunta '+(i+1)); c.appendChild(ta);
+    const btn=el('button','btn',b('Show mark scheme','Mostrar criterios de calificación')); btn.type='button';
+    const ms=el('div','ms'); ms.hidden=true;
+    const ul=el('ul'); x.a.forEach(p=>ul.appendChild(el('li','',b(p[0],p[1])))); ms.appendChild(ul);
+    if(x.n) ms.appendChild(el('p','',b(x.n[0],x.n[1])));
+    btn.addEventListener('click',()=>{ms.hidden=!ms.hidden; btn.innerHTML=ms.hidden?b('Show mark scheme','Mostrar criterios de calificación'):b('Hide mark scheme','Ocultar criterios de calificación');});
+    c.appendChild(btn); c.appendChild(ms);
+    host.appendChild(c);
+  });
+})();
+
+/* Restore the student's last choice (off by default) */
+let startOn=false;
+try{ startOn = localStorage.getItem('homeostasis-es')==='1'; }catch(e){}
+setEs(startOn);
+</script>
+</body>
+</html>
